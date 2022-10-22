@@ -1,6 +1,6 @@
 import numpy as np
 import jax as jnp
-import utilties
+from models import utilities
 
 ###################
 ### SPIN MODELS ###
@@ -37,8 +37,8 @@ def IsotropicPlusBetaSpinTilts(cost1,cost2,BF,tiltBetaA,tiltBetaB):
     p_iso = BF / 4.0   # divided by 4 since this is 0.5 for each component
 
     # aligned component
-    p_aligned1 = utilties.BetaDistribution(cost1, tiltBetaA, tiltBetaB, betaMin=-1, betaMax=1)
-    p_aligned2 = utilties.BetaDistribution(cost2, tiltBetaA, tiltBetaB, betaMin=-1, betaMax=1)
+    p_aligned1 = utilities.betaDistribution(cost1, tiltBetaA, tiltBetaB, betaMin=-1, betaMax=1)
+    p_aligned2 = utilities.betaDistribution(cost2, tiltBetaA, tiltBetaB, betaMin=-1, betaMax=1)
     p_aligned = (1-BF) * p_aligned1 * p_aligned2
 
     p_cost1_cost2 = p_iso + p_aligned
