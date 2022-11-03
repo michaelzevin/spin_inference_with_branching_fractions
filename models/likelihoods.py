@@ -40,11 +40,21 @@ def betaPlusIsotropic(sampleDict,injectionDict):
     log_R20 = numpyro.sample("log_R20", dist.Uniform(-2,1))
     R20 = numpyro.deterministic("R20", 10.**log_R20)
     beta_q = numpyro.sample("beta_q", dist.Normal(0,3))
-    BF = numpyro.sample("BF", dist.Uniform(0,1))   # FIXME: this is what we will constrain
+    BF = numpyro.sample("BF", dist.Uniform(0,1))   # NOTE: this is what we will constrain
     log_tiltBetaA = numpyro.sample("log_tiltBetaA", dist.Normal(0,1))
     log_tiltBetaB = numpyro.sample("log_tiltBetaB", dist.Normal(0,1))
     log_chiBetaA = numpyro.sample("log_chiBetaA", dist.Normal(0,1))
     log_chiBetaB = numpyro.sample("log_chiBetaB", dist.Normal(0,1))
+
+    """alpha = numpyro.sample("alpha",dist.Normal(-2,3))
+    mMin = numpyro.sample("mMin",dist.Uniform(3,10))
+    mMax = numpyro.sample("mMax",dist.Uniform(50,100))
+    lambdaPeak = numpyro.sample("lambdaPeak",dist.Uniform(0,1))
+    meanPeak = numpyro.sample("meanPeak",dist.Uniform(20,50))
+    sigmaPeak = numpyro.sample("sigmaPeak",dist.Uniform(2,10))
+    dmMinTaper = numpyro.sample("dmMinTaper",dist.Uniform(1,10))
+    dmMaxTaper = numpyro.sample("dmMaxTaper",dist.Uniform(1,10))
+    kappa = numpyro.sample("kappa",dist.Normal(3.,2))"""
 
     # Fixed parameters
     alpha=-3.51
@@ -110,9 +120,9 @@ def betaPlusIsotropic(sampleDict,injectionDict):
         # Compute proposed population weights
         p_m1 = mass_models.PowerlawPlusPeakPrimary(m1_sample,alpha,mMin,mMax,lambdaPeak,meanPeak,sigmaPeak,dmMinTaper,dmMaxTaper)
         p_m2 = mass_models.PowerlawSecondary(m1_sample,m2_sample,mMin,dmMinTaper)
+        p_z = redshift_models.PowerlawRedshift(z_sample,dVdz_sample,kappa)
         p_chi = spin_models.BetaSpinMags(chi1_sample,chi2_sample,10**log_chiBetaA,10**log_chiBetaB)
         p_tilt = spin_models.IsotropicPlusBetaSpinTilts(cost1_sample,cost2_sample,BF,10**log_tiltBetaA,10**log_tiltBetaB)
-        p_z = redshift_models.PowerlawRedshift(z_sample,dVdz_sample,kappa)
         R_pop = R20*p_m1*p_m2*p_z*p_chi*p_tilt
 
         mc_weights = R_pop / priors
